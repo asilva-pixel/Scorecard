@@ -174,7 +174,7 @@
        guarda ni sincroniza nada entre dispositivos.
        ============================================================ -->
   <div class="setup-warning" id="setupWarning" style="display:none;">
-    ⚠ Falta configurar SHEET_API_URL en el código (línea marcada como CONFIGURACIÓN). Mientras tanto, los datos no se guardan.
+    ⚠ El flujo de n8n aún no está activo o no responde. Revisa que esté publicado y que las hojas de Google Sheets estén seleccionadas en ambos nodos.
   </div>
 
   <div class="race">
@@ -200,10 +200,11 @@
 
 <script>
 // ============================================================
-// CONFIGURACIÓN: pega aquí la URL de tu Apps Script desplegado
-// (la que termina en /exec). Ver instrucciones de despliegue.
+// CONFIGURACIÓN: URLs del flujo de n8n "Scorecard AM México - Sync"
+// Ya están completas — solo necesitas activar el flujo en n8n.
 // ============================================================
-const SHEET_API_URL = "";
+const SAVE_URL = "https://n8n.openip.cl/webhook/scorecard-save";
+const LOAD_URL = "https://n8n.openip.cl/webhook/scorecard-load";
 
 const candidates = ["Elizabeth","Eliab","Patricia","Alcides"];
 const dims = [
@@ -298,13 +299,13 @@ function setStatus(state, text){
 }
 
 async function syncCell(i, c, field, value){
-  if(!SHEET_API_URL){ setStatus('err','Sin conexión configurada'); return; }
+  if(!SAVE_URL){ setStatus('err','Sin conexión configurada'); return; }
   setStatus('busy','Guardando...');
   try{
     const payload = { dimension: dims[i].title, candidato: c };
     payload[field] = value;
     // Sin header Content-Type explícito para evitar preflight CORS
-    const res = await fetch(SHEET_API_URL, { method:'POST', body: JSON.stringify(payload) });
+    const res = await fetch(SAVE_URL, { method:'POST', body: JSON.stringify(payload) });
     const json = await res.json();
     if(!json.ok) throw new Error(json.error || 'error desconocido');
     setStatus('ok','Guardado en Sheet');
@@ -315,7 +316,7 @@ async function syncCell(i, c, field, value){
 }
 
 async function loadFromSheet(){
-  if(!SHEET_API_URL){
+  if(!LOAD_URL){
     document.getElementById('setupWarning').style.display = 'block';
     setStatus('err','Sin conexión configurada');
     renderRace();
@@ -323,7 +324,7 @@ async function loadFromSheet(){
   }
   setStatus('busy','Cargando desde Sheet...');
   try{
-    const res = await fetch(SHEET_API_URL);
+    const res = await fetch(LOAD_URL);
     const json = await res.json();
     if(json.ok && json.rows){
       json.rows.forEach(row=>{
