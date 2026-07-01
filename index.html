@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Scorecard — Account Manager México</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+  :root{
+    --ink:#1B1B1B;
+    --paper:#FFFFFF;
+    --pink:#FA345E;
+    --pink-soft:#FFE6E8;
+    --lav:#B2A8E7;
+    --deep:#146787;
+    --teal:#45C1AD;
+    --mint:#97E89F;
+    --lime:#D7FAB6;
+    --muted:#8A8A8A;
+    --line:#ECECEC;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    padding:28px 20px 60px;
+  }
+  .wrap{max-width:1100px;margin:0 auto;}
+
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--pink);
+    font-weight:600;
+  }
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:30px;
+    margin:4px 0 2px;
+    font-weight:700;
+    letter-spacing:-0.01em;
+    background:linear-gradient(90deg,var(--ink) 60%, var(--pink));
+    -webkit-background-clip:text;
+    background-clip:text;
+  }
+  .sub{color:var(--muted);font-size:14px;max-width:560px;}
+
+  .status{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--muted);
+  }
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--mint);flex-shrink:0;}
+  .dot.busy{background:var(--lav);}
+  .dot.err{background:var(--pink);}
+  #resetBtn{
+    border:1px solid var(--line);
+    background:var(--paper);
+    color:var(--deep);
+    font-family:'Inter',sans-serif;
+    font-size:11.5px;
+    font-weight:600;
+    padding:6px 12px;
+    border-radius:20px;
+    cursor:pointer;
+  }
+  #resetBtn:hover{border-color:var(--pink);color:var(--pink);}
+
+  .compliance{
+    background:var(--pink-soft);
+    border:1px solid #FAC9CE;
+    color:#9C1836;
+    border-radius:14px;
+    padding:12px 16px;
+    font-size:13px;
+    line-height:1.5;
+    margin-bottom:16px;
+  }
+  .compliance b{color:#7A0F26;}
+
+  .setup-warning{
+    background:#FFF7E0;
+    border:1px solid #F0D98A;
+    color:#7A5A00;
+    border-radius:14px;
+    padding:12px 16px;
+    font-size:12.5px;
+    line-height:1.5;
+    margin-bottom:22px;
+    font-family:'IBM Plex Mono',monospace;
+  }
+
+  .race{
+    background:var(--ink);
+    border-radius:18px;
+    padding:20px 22px;
+    margin-bottom:22px;
+  }
+  .race h2{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:14px;
+    margin:0 0 14px;
+    color:#fff;
+    letter-spacing:.01em;
+  }
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .bar-name{width:130px;font-size:13px;font-weight:600;flex-shrink:0;color:#fff;}
+  .bar-track{flex:1;background:#2E2E2E;border-radius:20px;height:24px;position:relative;overflow:hidden;}
+  .bar-fill{height:100%;background:linear-gradient(90deg,var(--deep),var(--teal));border-radius:20px;transition:width .3s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;}
+  .bar-fill.top{background:linear-gradient(90deg,var(--pink),#FF6B87);}
+  .bar-score{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#fff;font-weight:600;}
+
+  table{width:100%;border-collapse:collapse;background:var(--paper);border-radius:16px;overflow:hidden;border:1px solid var(--line);}
+  th,td{padding:12px 10px;vertical-align:top;border-bottom:1px solid var(--line);}
+  th{text-align:left;background:var(--lime);font-family:'Space Grotesk',sans-serif;font-size:13px;}
+  td.dim{width:230px;}
+  .dim-title{font-weight:600;font-size:13.5px;margin-bottom:3px;}
+  .dim-desc{font-size:11.5px;color:var(--muted);line-height:1.4;}
+  .cand-head{font-size:13px;}
+  .cand-sub{font-size:10.5px;color:#4a4a4a;font-weight:400;}
+
+  .scorepick{display:flex;gap:4px;margin-bottom:6px;}
+  .scorepick button{
+    width:26px;height:26px;border-radius:8px;border:1px solid var(--line);
+    background:#fff;font-family:'IBM Plex Mono',monospace;font-size:12px;cursor:pointer;color:var(--muted);
+  }
+  .scorepick button.active{background:var(--pink);color:#fff;border-color:var(--pink);}
+  textarea{
+    width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;
+    font-family:'Inter',sans-serif;font-size:11.5px;padding:6px 8px;resize:vertical;color:var(--ink);
+  }
+  textarea:focus{outline:2px solid var(--lav);border-color:transparent;}
+  textarea::placeholder{color:#B7B7B7;}
+
+  footer{margin-top:20px;font-size:11.5px;color:var(--muted);text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Proceso comercial · Guadalajara, México</div>
+      <h1>Scorecard en vivo — Account Manager</h1>
+      <div class="sub">Cada cambio se guarda directo en el Google Sheet conectado. Puedes cerrar esta página y retomar desde cualquier dispositivo.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+      <div class="status"><span class="dot" id="statusDot"></span><span id="statusText">Conectando...</span></div>
+      <button id="resetBtn">Borrar todo en el Sheet</button>
+    </div>
+  </header>
+
+  <div class="compliance">
+    <b>Nota de equidad:</b> este scorecard evalúa únicamente competencias y evidencia de desempeño. Cualquier información personal, de salud o de vida privada compartida durante el proceso queda excluida de la evaluación y no debe influir en el puntaje ni en la decisión final.
+  </div>
+
+  <!-- ============================================================
+       CONFIGURACIÓN — pega aquí la URL de tu Apps Script desplegado
+       (termina en /exec). Sin esto, la página funciona pero no
+       guarda ni sincroniza nada entre dispositivos.
+       ============================================================ -->
+  <div class="setup-warning" id="setupWarning" style="display:none;">
+    ⚠ Falta configurar SHEET_API_URL en el código (línea marcada como CONFIGURACIÓN). Mientras tanto, los datos no se guardan.
+  </div>
+
+  <div class="race">
+    <h2>RANKING EN VIVO</h2>
+    <div id="raceBars"></div>
+  </div>
+
+  <table id="scoreTable">
+    <thead>
+      <tr>
+        <th style="width:230px;">Dimensión</th>
+        <th class="cand-head">Elizabeth Rodríguez<br><span class="cand-sub">DiDi / Rappi · foodtech</span></th>
+        <th class="cand-head">Eliab Villaseñor<br><span class="cand-sub">Medical Expo / AT&T</span></th>
+        <th class="cand-head">Patricia Flores<br><span class="cand-sub">Alesca / Compucad</span></th>
+        <th class="cand-head">Alcides Díaz<br><span class="cand-sub">Siemens / Johnson Controls</span></th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+  <footer>Puntaje 1–5 por dimensión · promedio simple · datos sincronizados con Google Sheets</footer>
+</div>
+
+<script>
+// ============================================================
+// CONFIGURACIÓN: pega aquí la URL de tu Apps Script desplegado
+// (la que termina en /exec). Ver instrucciones de despliegue.
+// ============================================================
+const SHEET_API_URL = "";
+
+const candidates = ["Elizabeth","Eliab","Patricia","Alcides"];
+const dims = [
+  { title:"Autonomía y auto-gestión", desc:"Capacidad de operar sin Country Manager local, tomar decisiones y sostener el ritmo sin supervisión directa." },
+  { title:"Orientación a resultados", desc:"Evidencia cuantificable de cumplimiento/sobrecumplimiento de cuota y disciplina de seguimiento." },
+  { title:"Prospección y cierre B2B", desc:"Solidez del ciclo completo: identificar, contactar, negociar y cerrar cuentas nuevas." },
+  { title:"Fluidez tecnológica", desc:"Comodidad real con CRM, automatización (n8n) e IA como parte del flujo diario, no solo mención en el CV." },
+  { title:"Comunicación y construcción a distancia", desc:"Capacidad de ser referente y construir relaciones/equipo estando lejos del equipo local y del back en Chile." }
+];
+
+const scores = {};
+const notesData = {};
+dims.forEach((_,i)=>{ scores[i]={}; notesData[i]={}; candidates.forEach(c=>{ scores[i][c]=0; notesData[i][c]=''; }); });
+
+const tbody = document.getElementById('tbody');
+const pickerRefs = {};
+const textareaRefs = {};
+
+dims.forEach((dim,i)=>{
+  const tr = document.createElement('tr');
+  const dimTd = document.createElement('td');
+  dimTd.className='dim';
+  dimTd.innerHTML = `<div class="dim-title">${dim.title}</div><div class="dim-desc">${dim.desc}</div>`;
+  tr.appendChild(dimTd);
+
+  candidates.forEach(c=>{
+    const td = document.createElement('td');
+    const picker = document.createElement('div');
+    picker.className='scorepick';
+    for(let s=1;s<=5;s++){
+      const btn = document.createElement('button');
+      btn.textContent = s;
+      btn.onclick = ()=>{
+        scores[i][c]=s;
+        renderPicker(picker,i,c);
+        renderRace();
+        syncCell(i,c,'puntaje', s);
+      };
+      picker.appendChild(btn);
+    }
+    pickerRefs[`${i}-${c}`] = picker;
+
+    const notes = document.createElement('textarea');
+    notes.placeholder = 'Nota breve...';
+    notes.oninput = ()=>{ notesData[i][c] = notes.value; };
+    notes.onblur = ()=>syncCell(i,c,'nota', notesData[i][c]);
+    textareaRefs[`${i}-${c}`] = notes;
+
+    td.appendChild(picker);
+    td.appendChild(notes);
+    tr.appendChild(td);
+  });
+  tbody.appendChild(tr);
+});
+
+function renderPicker(picker,i,c){
+  [...picker.children].forEach((btn,idx)=>{
+    btn.classList.toggle('active', idx+1 === scores[i][c]);
+  });
+}
+
+function renderRace(){
+  const totals = candidates.map(c=>{
+    let sum=0, n=0;
+    dims.forEach((_,i)=>{ if(scores[i][c]>0){ sum+=scores[i][c]; n++; } });
+    return { c, avg: n ? sum/n : 0 };
+  }).sort((a,b)=>b.avg-a.avg);
+
+  const max = 5;
+  const container = document.getElementById('raceBars');
+  container.innerHTML = '';
+  totals.forEach((t,idx)=>{
+    const row = document.createElement('div');
+    row.className='bar-row';
+    const pct = (t.avg/max*100).toFixed(0);
+    row.innerHTML = `
+      <div class="bar-name">${t.c}</div>
+      <div class="bar-track">
+        <div class="bar-fill ${idx===0 && t.avg>0 ? 'top':''}" style="width:${pct}%">
+          <span class="bar-score">${t.avg.toFixed(1)}</span>
+        </div>
+      </div>`;
+    container.appendChild(row);
+  });
+}
+
+function setStatus(state, text){
+  const dot = document.getElementById('statusDot');
+  const label = document.getElementById('statusText');
+  dot.className = 'dot' + (state === 'busy' ? ' busy' : state === 'err' ? ' err' : '');
+  label.textContent = text;
+}
+
+async function syncCell(i, c, field, value){
+  if(!SHEET_API_URL){ setStatus('err','Sin conexión configurada'); return; }
+  setStatus('busy','Guardando...');
+  try{
+    const payload = { dimension: dims[i].title, candidato: c };
+    payload[field] = value;
+    // Sin header Content-Type explícito para evitar preflight CORS
+    const res = await fetch(SHEET_API_URL, { method:'POST', body: JSON.stringify(payload) });
+    const json = await res.json();
+    if(!json.ok) throw new Error(json.error || 'error desconocido');
+    setStatus('ok','Guardado en Sheet');
+  }catch(err){
+    console.error('Error sincronizando con Sheet:', err);
+    setStatus('err','No se pudo guardar — revisa la conexión');
+  }
+}
+
+async function loadFromSheet(){
+  if(!SHEET_API_URL){
+    document.getElementById('setupWarning').style.display = 'block';
+    setStatus('err','Sin conexión configurada');
+    renderRace();
+    return;
+  }
+  setStatus('busy','Cargando desde Sheet...');
+  try{
+    const res = await fetch(SHEET_API_URL);
+    const json = await res.json();
+    if(json.ok && json.rows){
+      json.rows.forEach(row=>{
+        const dimIndex = dims.findIndex(d=>d.title === row.Dimension);
+        if(dimIndex === -1) return;
+        const c = row.Candidato;
+        if(!candidates.includes(c)) return;
+        if(row.Puntaje){
+          scores[dimIndex][c] = Number(row.Puntaje);
+          renderPicker(pickerRefs[`${dimIndex}-${c}`], dimIndex, c);
+        }
+        if(row.Nota){
+          notesData[dimIndex][c] = row.Nota;
+          textareaRefs[`${dimIndex}-${c}`].value = row.Nota;
+        }
+      });
+    }
+    setStatus('ok','Sincronizado');
+  }catch(err){
+    console.error('Error cargando desde Sheet:', err);
+    setStatus('err','No se pudo cargar el Sheet');
+  }
+  renderRace();
+}
+
+document.getElementById('resetBtn').onclick = async ()=>{
+  if(!confirm('¿Borrar todos los puntajes y notas en el Sheet conectado?')) return;
+  dims.forEach((_,i)=>{
+    candidates.forEach(c=>{
+      scores[i][c] = 0;
+      notesData[i][c] = '';
+      renderPicker(pickerRefs[`${i}-${c}`], i, c);
+      textareaRefs[`${i}-${c}`].value = '';
+      syncCell(i, c, 'puntaje', 0);
+      syncCell(i, c, 'nota', '');
+    });
+  });
+  renderRace();
+};
+
+loadFromSheet();
+</script>
+</body>
+</html>
